@@ -1,0 +1,39 @@
+name: Web Cloud Build
+
+on:
+  # 当你点击网页上的 "Commit changes" (提交) 时触发
+  push:
+    branches: [ "main", "master" ]
+  # 允许你手动在 Actions 页面点击按钮触发
+  workflow_dispatch:
+
+jobs:
+  build-on-cloud:
+    runs-on: windows-latest  # 申请一台 Windows 服务器
+
+    steps:
+    # 1. 把你的代码拉取到服务器
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. 配置 MSBuild 环境
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # 3. 恢复 NuGet 包 (如果是 C# 项目通常需要，C++ 项目可忽略或删除此步)
+    - name: Restore NuGet
+      run: nuget restore
+
+    # 4. 执行你的编译命令
+    - name: Run MSBuild
+      run: msbuild /p:platform=win32 /p:Configuration=Release
+
+    # 5. 【关键】把生成的 exe 打包上传，让你能下载
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: My-App-Release  # 下载时的压缩包名字
+        path: |
+          **/Release/*.exe
+          **/Release/*.dll
+        # 上面的 path 使用了通配符，会自动搜索所有 Release 文件夹下的 exe 和 dll
