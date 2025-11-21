@@ -18,16 +18,15 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    # 3. 编译 (已移除报错的 nuget restore)
-    # 这里使用了 README 中指定的命令，并加上 *.vcxproj 确保选中项目文件
+    # 3. 【修正】明确指定文件名 keycastow.vcxproj
     - name: Build
-      run: msbuild *.vcxproj /p:platform=win32 /p:Configuration=Release
+      run: msbuild keycastow.vcxproj /p:platform=win32 /p:Configuration=Release
 
     # 4. 上传生成的 exe 文件
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: KeyCastOW-Build
+        name: KeyCastOW-Release
         path: |
           **/Release/*.exe
           **/Release/*.dll
